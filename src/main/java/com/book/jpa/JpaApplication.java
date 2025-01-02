@@ -1,6 +1,5 @@
 package com.book.jpa;
 
-import com.book.jpa.domain.member.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;

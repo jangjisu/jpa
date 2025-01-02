@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class MessageTest {
     @DisplayName("저장된 메시지의 내용은 빈 값이 올 수 없다.")
     @Test
