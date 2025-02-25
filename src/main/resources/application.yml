@@ -2,6 +2,10 @@ spring:
   application:
     name: my-jpa-application
 
+  cloud:
+    config:
+      enabled: false
+
   datasource:
     url: jdbc:h2:mem:~/jpa
     driverClassName: org.h2.Driver
@@ -24,3 +28,7 @@ spring:
   h2:
     console:
       enabled: true
+
+eureka:
+  client:
+    enabled: false
