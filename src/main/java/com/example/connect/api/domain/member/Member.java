@@ -1,5 +1,6 @@
 package com.example.connect.api.domain.member;
 
+import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.order.Order;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
