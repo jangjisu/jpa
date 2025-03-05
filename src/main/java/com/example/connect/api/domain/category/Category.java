@@ -1,21 +1,44 @@
 package com.example.connect.api.domain.category;
 
-import com.example.connect.api.domain.categoryitem.CategoryItem;
+import com.example.connect.api.domain.item.Item;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
+    @Column(name = "CATEGORY_ID")
     private Long id;
 
-    //TODO parentId 자기자신 FK?
-    private String parentId;
     private String name;
 
-    @OneToMany(mappedBy = "category")
-    private List<CategoryItem> categoryItems;
+    @ManyToMany
+    @JoinTable(name = "CATEGORY_ITEM",
+            joinColumns = @JoinColumn(name = "CATEGORY_ID"),
+            inverseJoinColumns = @JoinColumn(name = "ITEM_ID"))
+    private List<Item> items = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "PARENT_ID")
+    private Category parent;
+
+    @OneToMany(mappedBy = "parent")
+    private List<Category> child = new ArrayList<>();
+
+    public void addChildCategory(Category child) {
+        this.child.add(child);
+        child.setParent(this);
+    }
+
+    public void addItem(Item item) {
+        items.add(item);
+    }
+
 }

@@ -1,21 +1,26 @@
 package com.example.connect.api.domain.item;
 
-import com.example.connect.api.domain.categoryitem.CategoryItem;
+import com.example.connect.api.domain.category.Category;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
+    @Column(name = "ITEM_ID")
     private Long id;
 
     private String name;
     private int price;
     private int stockQuantity;
 
-    @OneToMany(mappedBy = "item")
-    private List<CategoryItem> categoryItems;
+    @ManyToMany(mappedBy = "items")
+    private List<Category> categories = new ArrayList<>();
 }
