@@ -1,5 +1,6 @@
 package com.example.connect.api.domain.order;
 
+import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.delivery.Delivery;
 import com.example.connect.api.domain.member.Member;
 import com.example.connect.api.domain.orderitem.OrderItem;
@@ -15,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "ORDERS")
-public class Order {
+public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ORDER_ID")
