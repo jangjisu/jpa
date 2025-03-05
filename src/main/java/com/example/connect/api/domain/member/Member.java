@@ -2,14 +2,19 @@ package com.example.connect.api.domain.member;
 
 import com.example.connect.api.domain.order.Order;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
+    @Column(name = "MEMBER_ID")
     private Long id;
     private String name;
     private String city;
@@ -17,5 +22,5 @@ public class Member {
     private String zipCode;
 
     @OneToMany(mappedBy = "member")
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 }
