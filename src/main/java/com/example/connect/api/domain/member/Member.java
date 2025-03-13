@@ -1,5 +1,6 @@
 package com.example.connect.api.domain.member;
 
+import com.example.connect.api.domain.embedded.Address;
 import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.order.Order;
 import jakarta.persistence.*;
@@ -18,9 +19,9 @@ public class Member extends BaseEntity {
     @Column(name = "MEMBER_ID")
     private Long id;
     private String name;
-    private String city;
-    private String street;
-    private String zipCode;
+
+    @Embedded
+    private Address address;
 
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
