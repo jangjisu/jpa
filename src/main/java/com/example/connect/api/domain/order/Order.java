@@ -2,6 +2,7 @@ package com.example.connect.api.domain.order;
 
 import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.delivery.Delivery;
+import com.example.connect.api.domain.item.Item;
 import com.example.connect.api.domain.member.Member;
 import com.example.connect.api.domain.orderitem.OrderItem;
 import jakarta.persistence.*;
@@ -30,7 +31,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "DELIVERY_ID")
     private Delivery delivery;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     private LocalDateTime orderDate;
@@ -54,5 +55,16 @@ public class Order extends BaseEntity {
     public void setDeilvery(Delivery deilvery) {
         this.delivery = deilvery;
         deilvery.setOrder(this);
+    }
+
+    public void changeOrderItems(List<Item> items) {
+        this.orderItems.clear();
+
+        for (Item item : items) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setItem(item);
+            orderItem.setOrder(this);
+            orderItems.add(orderItem);
+        }
     }
 }
