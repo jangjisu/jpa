@@ -1,5 +1,6 @@
 package com.example.connect.learn;
 
+import com.example.connect.api.domain.item.Movie;
 import com.example.connect.api.domain.member.Member;
 import com.example.connect.api.domain.member.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -253,6 +254,31 @@ class JpaTest {
         try {
             String sql = "SELECT * FROM MEMBER WHERE NAME = 'kim'";
             List<Member> members = em.createNativeQuery(sql, Member.class).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+    }
+
+    @DisplayName("")
+    @Test
+    void test() {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            // given
+            Movie movie = new Movie();
+            em.persist(movie);
+
+            em.detach(movie);
+
+            em.merge(movie);
+
+            // when
+
+            // then
         } catch (Exception e) {
             e.printStackTrace();
             em.getTransaction().rollback();

@@ -24,7 +24,6 @@ class OrderTest {
     @PersistenceUnit
     private EntityManagerFactory emf;
     private EntityManager em;
-    private EntityTransaction tx;
     private Order order;
     private List<Item> initialItems = new ArrayList<>();
     private List<Item> newItems = new ArrayList<>();
@@ -33,7 +32,7 @@ class OrderTest {
     void setUp() {
         // JPA 엔티티 매니저 설정
         em = emf.createEntityManager();
-        tx = em.getTransaction();
+        EntityTransaction tx = em.getTransaction();
         tx.begin(); // 트랜잭션 시작
 
         order = new Order();
