@@ -38,4 +38,14 @@ public class Member extends BaseEntity {
     public static Member create(String phoneNum, String name) {
         return new Member(phoneNum, name);
     }
+
+    public Member(String phoneNum, String name, Address address) {
+        this.name = name;
+        this.phoneNum = phoneNum;
+        this.address = address;
+    }
+
+    public static Member create(String phoneNum, String name, Address address) {
+        return new Member(phoneNum, name, address);
+    }
 }

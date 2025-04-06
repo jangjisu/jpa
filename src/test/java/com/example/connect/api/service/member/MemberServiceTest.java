@@ -38,14 +38,11 @@ class MemberServiceTest {
     void 중복_회원_예외() {
         // given
         Member member1 = Member.create("01012345678", "홍길동");
-
         Long savedId = memberService.join(member1);
 
-
+        // when
         Member member2 = Member.create("01012345678", "홍길동");
         member2.setId(savedId);
-
-        // when
         // then
         assertThatThrownBy(() -> memberService.join(member2))
                 .isInstanceOf(IllegalStateException.class)
