@@ -2,11 +2,14 @@ package com.example.connect.api.domain.order;
 
 import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.delivery.Delivery;
-import com.example.connect.api.domain.item.Item;
+import com.example.connect.api.domain.delivery.DeliveryStatus;
 import com.example.connect.api.domain.member.Member;
 import com.example.connect.api.domain.orderitem.OrderItem;
+import com.example.connect.api.exception.DeliveryException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "ORDERS")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,17 +31,46 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "DELIVERY_ID")
     private Delivery delivery;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems = new ArrayList<>();
-
     private LocalDateTime orderDate;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private OrderStatus orderStatus;
+
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+        Order order = new Order();
+        order.member = member;
+        order.delivery = delivery;
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+        order.orderStatus = OrderStatus.ORDER;
+        order.orderDate = LocalDateTime.now();
+        return order;
+    }
+
+    public void cancel() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {
+            throw new DeliveryException("이미 배송완료된 상품은 취소가 불가능합니다.");
+        }
+
+        this.orderStatus = OrderStatus.CANCEL;
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancel();
+        }
+    }
+
+    public int getTotalPrice() {
+        return orderItems.stream()
+                .mapToInt(OrderItem::getTotalPrice)
+                .sum();
+    }
 
     public void setMember(Member member) {
         if (this.member != null) {
@@ -55,16 +88,5 @@ public class Order extends BaseEntity {
     public void setDeilvery(Delivery deilvery) {
         this.delivery = deilvery;
         deilvery.setOrder(this);
-    }
-
-    public void changeOrderItems(List<Item> items) {
-        this.orderItems.clear();
-
-        for (Item item : items) {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setItem(item);
-            orderItem.setOrder(this);
-            orderItems.add(orderItem);
-        }
     }
 }
