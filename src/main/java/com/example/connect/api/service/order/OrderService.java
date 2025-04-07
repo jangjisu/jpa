@@ -7,7 +7,7 @@ import com.example.connect.api.domain.member.MemberRepository;
 import com.example.connect.api.domain.order.Order;
 import com.example.connect.api.domain.order.OrderSearch;
 import com.example.connect.api.domain.orderitem.OrderItem;
-import com.example.connect.api.domain.orderitem.OrderRepository;
+import com.example.connect.api.domain.order.OrderRepository;
 import com.example.connect.api.service.item.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
