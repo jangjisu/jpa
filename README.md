@@ -1,2 +1,2 @@
-# spa
-jpa 공부와
+# jpa
+jpa 예제 공부
