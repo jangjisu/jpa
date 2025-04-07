@@ -9,7 +9,7 @@ import com.example.connect.api.domain.member.MemberRepository;
 import com.example.connect.api.domain.order.Order;
 import com.example.connect.api.domain.order.OrderStatus;
 import com.example.connect.api.domain.orderitem.OrderItem;
-import com.example.connect.api.domain.orderitem.OrderRepository;
+import com.example.connect.api.domain.order.OrderRepository;
 import com.example.connect.api.exception.NotEnoughStockException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
