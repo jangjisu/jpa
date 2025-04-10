@@ -7,6 +7,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, QuerydslPredicateExecutor<Item> {
     @Modifying(clearAutomatically = true) //clearAutomatically 영속성 컨텍스트 초기화
-    @Query("update Item i set i.price = i.price * 1.1 where i.stockQuantity < :stockAmount")
-    int bulkPriceUp(int stockAmount);
+    @Query("update Item i set i.price = FUNCTION('ROUND', i.price * 1.1) where i.stockQuantity < :stockAmount")
+    void bulkPriceUp(int stockAmount);
 }
