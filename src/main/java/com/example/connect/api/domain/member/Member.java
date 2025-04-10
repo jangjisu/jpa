@@ -1,5 +1,6 @@
 package com.example.connect.api.domain.member;
 
+import com.example.connect.api.converter.BooleanToYNConverter;
 import com.example.connect.api.domain.embedded.Address;
 import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.order.Order;
@@ -23,6 +24,9 @@ public class Member extends BaseEntity {
     private Long id;
     private String phoneNum;
     private String name;
+
+    @Convert(converter = BooleanToYNConverter.class)
+    private boolean vip;
 
     @Embedded
     private Address address;
