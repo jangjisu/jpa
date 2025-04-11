@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: my-jpa-application
+
+  cloud:
+    config:
+      enabled: false
+
+  datasource:
+    url: jdbc:h2:mem:~/jpa
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        generate_statistics: true
+        format_sql: true
+
+
+
+    defer-datasource-initialization: false # (boot 2.5 이후) Hibernate 초기화 이후 data.sql 실행
+
+  h2:
+    console:
+      enabled: true
+
+eureka:
+  client:
+    enabled: false
