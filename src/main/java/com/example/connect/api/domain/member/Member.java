@@ -1,14 +1,12 @@
 package com.example.connect.api.domain.member;
 
 import com.example.connect.api.converter.BooleanToYNConverter;
+import com.example.connect.api.domain.article.Article;
 import com.example.connect.api.domain.embedded.Address;
 import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.order.Order;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -31,8 +30,12 @@ public class Member extends BaseEntity {
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     private List<Order> orders = new ArrayList<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<Article> articles = new ArrayList<>();
 
     public Member(String phoneNum, String name) {
         this.name = name;
