@@ -32,7 +32,8 @@ public class Member extends BaseEntity {
     @Embedded
     private Address address;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
     @ToString.Exclude
