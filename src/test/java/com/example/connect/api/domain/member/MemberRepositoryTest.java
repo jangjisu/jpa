@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -75,7 +77,34 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("Fetch를 추가하지 않아도, EntityGraph를 사용하면 한번만 조회된다")
+    void fetchQueryEntityGraph() {
+        //when
+        getStatistics().clear();
+        List<Member> members = memberRepository.findAllJPQLEntityGraphFetch();
+        for (Member member : members) {
+            List<Article> articles = member.getArticles(); //쿼리 X
+            System.out.println("articles = " + articles);
+        }
 
+        //articles 에 대해서 조회할 때, 쿼리가 일어나지 않는다.
+        assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Pageable과 함께 Fetch를 사용하면, 인메모리를 적용해서 조인 부분이 나온다")
+    void fetchWithPagination() {
+        //when
+        PageRequest pageRequest = PageRequest.of(0, 100);
+        Page<Member> members = memberRepository.findAllPage(pageRequest);
+
+        for (Member member : members) {
+            System.out.println(member.getArticles().size());
+        }
+
+        //WARN 7344 --- [my-jpa-application] [    Test worker] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory 발생
+    }
 
     private Member createMember() {
         Member member = Member.create("01012341234", "ABC");
