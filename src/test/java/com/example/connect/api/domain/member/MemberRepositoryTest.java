@@ -49,8 +49,8 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     }
 
     @Test
-    @DisplayName("일반 Join 쿼리문은 BatchSize 개수만큼 한번에 구해온다")
-    void noFetchQuery() {
+    @DisplayName("일반 Join 쿼리문은 N+1 문제가 발생한다")
+    void noFetchQuery () {
         //when
         getStatistics().clear();
         List<Member> members = memberRepository.findAllJPQL();
@@ -58,16 +58,13 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
             List<Article> articles = member.getArticles(); //쿼리 O
             System.out.println("articles = " + articles);
         }
-
-        int articleBatchSize = 2;
-        int queryCount = (int) Math.ceil((double) members.size() / articleBatchSize);
         //articles 에 대해서 조회할 때, 쿼리가 한번더 일어난다. 1 + N
-        assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1 + queryCount);
+        assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1 + members.size());
     }
 
     @Test
     @DisplayName("Join Fetch 쿼리문은 한번만 조회된다")
-    void fetchQuery() {
+    void fetchQuery () {
         //when
         getStatistics().clear();
         List<Member> members = memberRepository.findAllJPQLFetch();
@@ -96,7 +93,7 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     }
 
     @Test
-    @DisplayName("Pagable과 함께 Fetch를 사용하면, 인메모리를 적용해서 조인 부분이 나온다")
+    @DisplayName("Pageable과 함께 Fetch를 사용하면, 인메모리를 적용해서 조인 부분이 나온다")
     void fetchWithPagination() {
         //when
         PageRequest pageRequest = PageRequest.of(0, 100);
