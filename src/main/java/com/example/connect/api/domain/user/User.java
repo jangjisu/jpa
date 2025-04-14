@@ -59,6 +59,16 @@ public class User extends BaseEntity {
     public static User create(String phoneNum, String name, Address address) {
         return new User(phoneNum, name, address);
     }
+
+    public void addArticle(Article article) {
+        this.articles.add(article);
+        article.setUser(this);
+    }
+
+    public void addOrder(Order order) {
+        this.orders.add(order);
+        order.setUser(this);
+    }
 }
 
 

@@ -94,4 +94,12 @@ public class Order extends BaseEntity {
         this.delivery = deilvery;
         deilvery.setOrder(this);
     }
+
+    public void setUser(User user) {
+        if (this.user != null) {
+            this.user.getOrders().remove(this);
+        }
+        this.user = user;
+        user.getOrders().add(this);
+    }
 }

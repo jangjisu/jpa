@@ -35,4 +35,14 @@ public class Article {
     public static Article create(String title, String content, Member member) {
         return new Article(title, content, member);
     }
+
+    public void setUser (User user) {
+        if (this.user != null) {
+            this.user.getArticles().remove(this);
+        }
+        if (user != null) {
+            this.user = user;
+            user.getArticles().add(this);
+        }
+    }
 }
