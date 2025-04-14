@@ -7,7 +7,6 @@ import com.example.connect.api.domain.BaseEntity;
 import com.example.connect.api.domain.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ public class Member extends BaseEntity {
     private List<Order> orders = new ArrayList<>();
 
     @ToString.Exclude
-    @BatchSize(size = 2)
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Article> articles = new ArrayList<>();
 

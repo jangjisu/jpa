@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -81,6 +82,30 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         }
         //articles 에 대해서 조회할 때, 쿼리가 한번더 일어난다. 1 + N
         assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1 + members.size());
+    }
+
+    @Test
+    @DisplayName("일반 Join 쿼리문은 BatchSize 개수만큼 한번에 구해온다")
+    void batchSizeQuery() {
+        //멤버에 대한 조회를 막기 위해 미리 해온다..
+        preloadMembersToCache();
+
+        //when
+        getStatistics().clear();
+        List<User> users = userRepository.findAllJPQL();
+        for (User user : users) {
+            Set<Article> articles = user.getArticles(); //쿼리 O
+            System.out.println("articles = " + articles);
+        }
+
+        int articleBatchSize = 2;
+        int queryCount = (int) Math.ceil((double) users.size() / articleBatchSize);
+        //articles 에 대해서 조회할 때, 쿼리가 한번더 일어난다. 1 + N
+        assertThat(getStatistics().getPrepareStatementCount()).isEqualTo(1 + queryCount);
+    }
+
+    private void preloadMembersToCache() {
+        List<Member> members = memberRepository.findAll();
     }
 
     @Test
@@ -168,8 +193,10 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     private void createScenario(int memberCount, int articlesPerMember) {
         for (int i = 0; i < memberCount; i++) {
             Member member = createMember();
+            User user = createUser();
             for (int j = 0; j < articlesPerMember; j++) {
-                createArticle(member);
+                Article article = createArticle(member);
+                article.setUser(user);
             }
         }
     }
