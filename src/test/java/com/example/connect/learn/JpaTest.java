@@ -286,4 +286,67 @@ class JpaTest {
             em.close();
         }
     }
+
+    @DisplayName("")
+    @Test
+    void 영속성컨텍스트와_프록시() {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+            // given
+            Member newMember = new Member("0102345678", "회원1");
+            em.persist(newMember);
+            em.flush();
+            em.clear();
+
+            // when
+            Member refMember = em.getReference(Member.class, newMember.getId());
+            Member findMember = em.find(Member.class, newMember.getId());
+
+            System.out.println("refMember = " + refMember.getClass());
+            System.out.println("findMember = " + findMember.getClass());
+
+            //refMember = class com.example.connect.api.domain.member.Member$HibernateProxy$WwDAuiVc
+            //findMember = class com.example.connect.api.DFdomain.member.Member$HibernateProxy$WwDAuiVc
+
+            // then
+            assertThat(refMember).isSameAs(findMember);
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+    }
+
+    @DisplayName("")
+    @Test
+    void 영속성컨텍스트와_프록시역순() {
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            em.getTransaction().begin();
+            // given
+            Member newMember = new Member("0102345678", "회원1");
+            em.persist(newMember);
+            em.flush();
+            em.clear();
+
+            // when
+            Member findMember = em.find(Member.class, newMember.getId());
+            Member refMember = em.getReference(Member.class, newMember.getId());
+
+            System.out.println("refMember = " + refMember.getClass());
+            System.out.println("findMember = " + findMember.getClass());
+
+            // then
+            assertThat(refMember).isSameAs(findMember);
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+    }
 }
