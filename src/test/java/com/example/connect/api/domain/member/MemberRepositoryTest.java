@@ -3,6 +3,7 @@ package com.example.connect.api.domain.member;
 import com.example.connect.IntegrationJpaTestSupport;
 import com.example.connect.api.domain.article.Article;
 import com.example.connect.api.domain.article.ArticleRepository;
+import com.example.connect.api.domain.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.stat.Statistics;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 class MemberRepositoryTest extends IntegrationJpaTestSupport {
@@ -25,6 +28,9 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -104,6 +110,21 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         }
 
         //WARN 7344 --- [my-jpa-application] [    Test worker] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory 발생
+    }
+
+    @Test
+    @DisplayName("두개이상 1:N 연관관계를 지닌 엔티티를 List 형식으로 가져올 경우 MultipleBagFetchException 를 감싼 InvalidDataAccessApiUsageException 이 발생한다.")
+    void makeMultipleBagFetchException () {
+        //MultipleBagFetchException 을 감싸고 있음..
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+            memberRepository.findAllWithTwoEntities();
+        });
+    }
+
+    @Test
+    @DisplayName("두개이상 1:N 연관관계를 지닌 엔티티를 Set 형식으로 가져오기 가능하다.")
+    void solveMultipleBagFetchException () {
+        userRepository.findAllWithTwoEntities();
     }
 
     private Member createMember() {

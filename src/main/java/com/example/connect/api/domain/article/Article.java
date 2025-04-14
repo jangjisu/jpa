@@ -1,6 +1,7 @@
 package com.example.connect.api.domain.article;
 
 import com.example.connect.api.domain.member.Member;
+import com.example.connect.api.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,10 @@ public class Article {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     private Article(String title, String content, Member member) {
         this.title = title;
