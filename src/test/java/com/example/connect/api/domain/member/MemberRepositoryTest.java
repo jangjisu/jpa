@@ -3,6 +3,16 @@ package com.example.connect.api.domain.member;
 import com.example.connect.IntegrationJpaTestSupport;
 import com.example.connect.api.domain.article.Article;
 import com.example.connect.api.domain.article.ArticleRepository;
+import com.example.connect.api.domain.delivery.Delivery;
+import com.example.connect.api.domain.embedded.Address;
+import com.example.connect.api.domain.item.Book;
+import com.example.connect.api.domain.item.Item;
+import com.example.connect.api.domain.item.ItemRepository;
+import com.example.connect.api.domain.order.Order;
+import com.example.connect.api.domain.order.OrderRepository;
+import com.example.connect.api.domain.orderitem.OrderItem;
+import com.example.connect.api.domain.user.User;
+import com.example.connect.api.domain.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.stat.Statistics;
@@ -10,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 class MemberRepositoryTest extends IntegrationJpaTestSupport {
@@ -25,6 +37,15 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -106,14 +127,42 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         //WARN 7344 --- [my-jpa-application] [    Test worker] org.hibernate.orm.query                  : HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory 발생
     }
 
+    @Test
+    @DisplayName("두개이상 1:N 연관관계를 지닌 엔티티를 List 형식으로 가져올 경우 MultipleBagFetchException 를 감싼 InvalidDataAccessApiUsageException 이 발생한다.")
+    void makeMultipleBagFetchException () {
+        //MultipleBagFetchException 을 감싸고 있음..
+        assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+            memberRepository.findAllWithTwoEntities();
+        });
+    }
+
+    @Test
+    @DisplayName("두개이상 1:N 연관관계를 지닌 엔티티를 Set 형식으로 가져오기 가능하다.")
+    void solveMultipleBagFetchException () {
+        Member member = createMember();
+        Book book = createBook();
+        User user = createUser();
+        Article article = createArticle(member);
+        Order order = createOrder(member, book);
+
+        user.addArticle(article);
+        user.addOrder(order);
+
+        List<User> result = userRepository.findAllWithTwoEntities();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getArticles()).hasSize(1);
+        assertThat(result.get(0).getOrders()).hasSize(1);
+    }
+
     private Member createMember() {
         Member member = Member.create("01012341234", "ABC");
         return memberRepository.create(member);
     }
 
-    private void createArticle(Member member) {
+    private Article createArticle(Member member) {
         Article article = Article.create("123", "456", member);
-        articleRepository.create(article);
+        return articleRepository.create(article);
     }
 
     private void createScenario(int memberCount, int articlesPerMember) {
@@ -123,6 +172,23 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
                 createArticle(member);
             }
         }
+    }
+
+    private Book createBook() {
+        Book book = Book.create("ORM", 5000, 3, "김영한", "?");
+        return itemRepository.save(book);
+    }
+
+    private User createUser() {
+        User user = User.create("01012345678", "DEF");
+        return userRepository.save(user);
+    }
+
+    private Order createOrder(Member member, Item item) {
+        Address address = Address.create("", "", "");
+        OrderItem orderItem = OrderItem.create(item, item.getPrice(), 2);
+        Order order = Order.createOrder(member, Delivery.create(address), orderItem);
+        return orderRepository.save(order);
     }
 
 }

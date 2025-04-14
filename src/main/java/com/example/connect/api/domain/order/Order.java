@@ -5,6 +5,7 @@ import com.example.connect.api.domain.delivery.Delivery;
 import com.example.connect.api.domain.delivery.DeliveryStatus;
 import com.example.connect.api.domain.member.Member;
 import com.example.connect.api.domain.orderitem.OrderItem;
+import com.example.connect.api.domain.user.User;
 import com.example.connect.api.exception.DeliveryException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -30,6 +31,10 @@ public class Order extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -88,5 +93,13 @@ public class Order extends BaseEntity {
     public void setDeilvery(Delivery deilvery) {
         this.delivery = deilvery;
         deilvery.setOrder(this);
+    }
+
+    public void setUser(User user) {
+        if (this.user != null) {
+            this.user.getOrders().remove(this);
+        }
+        this.user = user;
+        user.getOrders().add(this);
     }
 }

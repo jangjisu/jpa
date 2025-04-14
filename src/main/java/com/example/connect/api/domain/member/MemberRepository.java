@@ -27,4 +27,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, CreateRep
 
     @Query("select distinct u from Member u left join fetch u.articles")
     List<Member> findAllJPQLFetch();
+
+    @Query("select distinct u from Member u left join u.articles left join u.orders")
+    @EntityGraph(attributePaths = {"articles", "orders"}, type = EntityGraph.EntityGraphType.FETCH)
+    List<Member> findAllWithTwoEntities();
 }
