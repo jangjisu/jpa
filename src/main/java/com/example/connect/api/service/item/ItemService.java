@@ -20,6 +20,10 @@ public class ItemService {
         return save.getId();
     }
 
+    public Item saveItemEntity(Item item) {
+        return itemRepository.save(item);
+    }
+
     public List<Item> findItems() {
         return itemRepository.findAll();
     }
