@@ -32,6 +32,15 @@ public class Article {
         member.getArticles().add(this);
     }
 
+    private Article(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public static Article create(String title, String content) {
+        return new Article(title, content);
+    }
+
     public static Article create(String title, String content, Member member) {
         return new Article(title, content, member);
     }

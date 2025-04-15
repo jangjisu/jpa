@@ -11,4 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long>, CreateReposit
     @Query("select distinct u from User u left join u.articles left join u.orders")
     @EntityGraph(attributePaths = {"articles", "orders"}, type = EntityGraph.EntityGraphType.FETCH)
     List<User> findAllWithTwoEntities();
+
+    @Query("select distinct u from User u left join u.articles")
+    List<User> findAllJPQL();
 }

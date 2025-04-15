@@ -14,7 +14,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DTYPE")
 @NoArgsConstructor
-public abstract class Item {
+public abstract class Item implements TitleView {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ITEM_ID")
@@ -26,6 +26,8 @@ public abstract class Item {
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
+
+    public abstract void accept(Visitor visitor);
 
     //== 비즈니스 로직 ==//
     public void addStock(int quantity) {

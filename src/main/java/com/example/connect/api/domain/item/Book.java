@@ -22,4 +22,14 @@ public class Book extends Item {
     public static Book create(String name, int price, int quantity, String author, String isbn) {
         return new Book(name, price, quantity, author, isbn);
     }
+
+    @Override
+    public String getTitle() {
+        return "[제목:" + getName() + "저자:" + author;
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
 }

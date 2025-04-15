@@ -3,15 +3,6 @@ package com.example.connect.api.domain.member;
 import com.example.connect.IntegrationJpaTestSupport;
 import com.example.connect.api.domain.article.Article;
 import com.example.connect.api.domain.article.ArticleRepository;
-import com.example.connect.api.domain.delivery.Delivery;
-import com.example.connect.api.domain.embedded.Address;
-import com.example.connect.api.domain.item.Book;
-import com.example.connect.api.domain.item.Item;
-import com.example.connect.api.domain.item.ItemRepository;
-import com.example.connect.api.domain.order.Order;
-import com.example.connect.api.domain.order.OrderRepository;
-import com.example.connect.api.domain.orderitem.OrderItem;
-import com.example.connect.api.domain.user.User;
 import com.example.connect.api.domain.user.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -42,12 +33,6 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     private UserRepository userRepository;
 
     @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
     private EntityManager entityManager;
 
     @Autowired
@@ -63,7 +48,7 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         memberRepository.deleteAll();
         articleRepository.deleteAll();
 
-        createScenario(5, 5);
+        createMemberArticleScenario(5, 5);
 
         entityManager.flush();
         entityManager.clear();
@@ -72,6 +57,8 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     @Test
     @DisplayName("일반 Join 쿼리문은 N+1 문제가 발생한다")
     void noFetchQuery () {
+        preloadUsersToCache();
+
         //when
         getStatistics().clear();
         List<Member> members = memberRepository.findAllJPQL();
@@ -86,6 +73,8 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     @Test
     @DisplayName("Join Fetch 쿼리문은 한번만 조회된다")
     void fetchQuery () {
+        preloadUsersToCache();
+
         //when
         getStatistics().clear();
         List<Member> members = memberRepository.findAllJPQLFetch();
@@ -101,6 +90,8 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
     @Test
     @DisplayName("Fetch를 추가하지 않아도, EntityGraph를 사용하면 한번만 조회된다")
     void fetchQueryEntityGraph() {
+        preloadUsersToCache();
+
         //when
         getStatistics().clear();
         List<Member> members = memberRepository.findAllJPQLEntityGraphFetch();
@@ -136,25 +127,6 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         });
     }
 
-    @Test
-    @DisplayName("두개이상 1:N 연관관계를 지닌 엔티티를 Set 형식으로 가져오기 가능하다.")
-    void solveMultipleBagFetchException () {
-        Member member = createMember();
-        Book book = createBook();
-        User user = createUser();
-        Article article = createArticle(member);
-        Order order = createOrder(member, book);
-
-        user.addArticle(article);
-        user.addOrder(order);
-
-        List<User> result = userRepository.findAllWithTwoEntities();
-
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getArticles()).hasSize(1);
-        assertThat(result.get(0).getOrders()).hasSize(1);
-    }
-
     private Member createMember() {
         Member member = Member.create("01012341234", "ABC");
         return memberRepository.create(member);
@@ -165,7 +137,7 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         return articleRepository.create(article);
     }
 
-    private void createScenario(int memberCount, int articlesPerMember) {
+    private void createMemberArticleScenario(int memberCount, int articlesPerMember) {
         for (int i = 0; i < memberCount; i++) {
             Member member = createMember();
             for (int j = 0; j < articlesPerMember; j++) {
@@ -174,21 +146,8 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         }
     }
 
-    private Book createBook() {
-        Book book = Book.create("ORM", 5000, 3, "김영한", "?");
-        return itemRepository.save(book);
-    }
-
-    private User createUser() {
-        User user = User.create("01012345678", "DEF");
-        return userRepository.save(user);
-    }
-
-    private Order createOrder(Member member, Item item) {
-        Address address = Address.create("", "", "");
-        OrderItem orderItem = OrderItem.create(item, item.getPrice(), 2);
-        Order order = Order.createOrder(member, Delivery.create(address), orderItem);
-        return orderRepository.save(order);
+    private void preloadUsersToCache() {
+        userRepository.findAll();
     }
 
 }

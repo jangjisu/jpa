@@ -44,4 +44,8 @@ public class OrderItem {
     public int getTotalPrice() {
         return orderPrice * count;
     }
+
+    public void printItem() {
+        System.out.println("TITLE=" + item.getTitle());
+    }
 }
