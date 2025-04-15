@@ -141,7 +141,7 @@ class MemberRepositoryTest extends IntegrationJpaTestSupport {
         for (int i = 0; i < memberCount; i++) {
             Member member = createMember();
             for (int j = 0; j < articlesPerMember; j++) {
-                Article article = createArticle(member);
+                createArticle(member);
             }
         }
     }
