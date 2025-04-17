@@ -25,7 +25,7 @@ public class Book extends Item {
 
     @Override
     public String getTitle() {
-        return "[제목:" + getName() + "저자:" + author;
+        return "[제목:" + getName() + "저자:" + author + "]";
     }
 
     @Override
